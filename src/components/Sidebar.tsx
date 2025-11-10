@@ -13,7 +13,9 @@ import {
   Phone, 
   Settings,
   Activity,
-  TrendingUp
+  TrendingUp,
+  Logs,
+  Terminal
 } from 'lucide-react';
 
 interface NavItem {
@@ -31,6 +33,7 @@ export default function Sidebar() {
     { name: 'Users', href: '/users', icon: Users },
     { name: 'Consultations', href: '/consultations', icon: Phone },
     { name: 'Analytics', href: '/analytics', icon: TrendingUp },
+    { name: 'Logs', href: '/logs', icon: Terminal },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

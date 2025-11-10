@@ -22,6 +22,7 @@ export function useMessages(limitCount: number = 50) {
         const data = doc.data();
         return {
           id: doc.id,
+          userName: data.name,
           messageId: data.messageId,
           from: data.from,
           type: data.type,

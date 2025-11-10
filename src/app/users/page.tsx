@@ -150,7 +150,8 @@ export default function UsersPage() {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">User ID</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">User Name</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">User Number</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">First Seen</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Last Seen</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Messages</th>
@@ -168,6 +169,9 @@ export default function UsersPage() {
                     >
                       <td className="py-3 px-4 text-sm text-gray-900 font-mono">
                         {user.name}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900 font-mono">
+                        {user.userId}
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-600">
                         {user.firstSeen ? new Date(user.firstSeen).toLocaleDateString('id-ID') : '-'}

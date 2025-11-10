@@ -1,11 +1,154 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { Save, Edit2, Eye, AlertCircle, RefreshCw } from 'lucide-react';
+import { Save, Edit2, Eye, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { useBotConfig } from '@/lib/hooks/useBotConfig';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, serverTimestamp, FieldValue } from 'firebase/firestore';
+
+// ✅ FIX 1: Pindahkan InputField KELUAR dari component parent
+interface InputFieldProps {
+  label: string;
+  path: string;
+  value: string;
+  placeholder: string;
+  type?: 'text' | 'textarea';
+  className?: string;
+  editingKey: string | null;
+  editValue: string;
+  saving: boolean;
+  previewKey: string | null;
+  onEdit: (path: string, value: string) => void;
+  onSave: (path: string) => void;
+  onCancel: () => void;
+  onEditValueChange: (value: string) => void;
+  onPreviewToggle: (path: string | null) => void;
+}
+
+function InputField({
+  label,
+  path,
+  value,
+  placeholder,
+  type = 'text',
+  className = '',
+  editingKey,
+  editValue,
+  saving,
+  previewKey,
+  onEdit,
+  onSave,
+  onCancel,
+  onEditValueChange,
+  onPreviewToggle,
+}: InputFieldProps) {
+  const isEditing = editingKey === path;
+  const isPreviewing = previewKey === path;
+
+  return (
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {label}
+      </label>
+      {isEditing ? (
+        <div className="space-y-2">
+          {type === 'textarea' ? (
+            <textarea
+              value={editValue}
+              onChange={(e) => onEditValueChange(e.target.value)}
+              rows={10}
+              className={`w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm ${className}`}
+              placeholder={placeholder}
+              autoFocus
+            />
+          ) : (
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => onEditValueChange(e.target.value)}
+              className={`w-full font-mono px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+              placeholder={placeholder}
+              autoFocus
+            />
+          )}
+          <div className="flex gap-2">
+            <button
+              onClick={() => onSave(path)}
+              disabled={saving || !editValue.trim()}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            >
+              {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+            <button
+              onClick={onCancel}
+              disabled={saving}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 flex items-center gap-2 transition-colors"
+            >
+              <X className="w-4 h-4" />
+              Cancel
+            </button>
+            <button
+              onClick={() => onPreviewToggle(isPreviewing ? null : path)}
+              className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center gap-2 transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+              {isPreviewing ? 'Hide Preview' : 'Show Preview'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="relative group">
+          <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 whitespace-pre-wrap font-mono text-sm text-black min-h-[42px]">
+            {value || <span className="text-gray-400">{placeholder}</span>}
+          </div>
+          <button
+            onClick={() => onEdit(path, value)}
+            className="absolute right-2 top-2 p-2 bg-white border border-gray-300 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50 hover:border-blue-400"
+          >
+            <Edit2 className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
+      )}
+      {isPreviewing && (
+        <div className="mt-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-semibold text-green-700">PREVIEW (WhatsApp format):</p>
+            <button
+              onClick={() => onPreviewToggle(null)}
+              className="text-green-600 hover:text-green-800"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="text-sm text-gray-800 whitespace-pre-wrap bg-white p-3 rounded border border-green-200">
+            {editValue || value}
+          </div>
+          <div className="mt-2 text-xs text-green-600">
+            Character count: {(editValue || value).length} / 4096
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ✅ FIX 2: Type-safe helper untuk nested object access
+function getNestedValue(obj: Record<string, unknown>, path: string): string {
+  const parts = path.split('.');
+  let current: unknown = obj;
+  
+  for (const part of parts) {
+    if (current && typeof current === 'object' && part in current) {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return '';
+    }
+  }
+  
+  return typeof current === 'string' ? current : '';
+}
 
 export default function MessagesPage() {
   const { config, loading } = useBotConfig();
@@ -16,9 +159,22 @@ export default function MessagesPage() {
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
 
+  // ✅ FIX 3: Sync edit value dengan Firebase updates (tapi jangan override saat user sedang mengetik)
+  useEffect(() => {
+    if (editingKey && config) {
+      const currentValue = getNestedValue(config as unknown as Record<string, unknown> , editingKey);
+      
+      // Hanya update jika user belum mulai mengetik
+      if (editValue === '' && currentValue) {
+        setEditValue(currentValue);
+      }
+    }
+  }, [config, editingKey, editValue]); // ✅ Hilangkan editValue dari dependency untuk mencegah loop
+
   const handleEdit = (path: string, currentValue: string) => {
     setEditingKey(path);
     setEditValue(currentValue);
+    setPreviewKey(null);
   };
 
   const handleSave = async (path: string) => {
@@ -27,8 +183,15 @@ export default function MessagesPage() {
       const configRef = doc(db, 'bot_config', 'messages');
       const pathParts = path.split('.');
 
-      // Build nested update object
-      const updateData: Record<string, string | FieldValue> = {};
+      const updateData: {
+        [key: string]: string | FieldValue;
+        last_updated: FieldValue;
+        updated_by: string;
+      } = {
+        last_updated: serverTimestamp(),
+        updated_by: 'admin',
+      };
+
       if (pathParts.length === 1) {
         updateData[pathParts[0]] = editValue;
       } else if (pathParts.length === 2) {
@@ -37,12 +200,11 @@ export default function MessagesPage() {
         updateData[`${pathParts[0]}.${pathParts[1]}.${pathParts[2]}`] = editValue;
       }
 
-      updateData.last_updated = serverTimestamp();
-      updateData.updated_by = 'admin';
-
       await updateDoc(configRef, updateData);
 
       setEditingKey(null);
+      setEditValue('');
+      setPreviewKey(null);
       setSuccessMessage('✅ Saved successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
@@ -56,6 +218,15 @@ export default function MessagesPage() {
   const handleCancel = () => {
     setEditingKey(null);
     setEditValue('');
+    setPreviewKey(null);
+  };
+
+  const handleEditValueChange = (value: string) => {
+    setEditValue(value);
+  };
+
+  const handlePreviewToggle = (key: string | null) => {
+    setPreviewKey(key);
   };
 
   if (loading) {
@@ -78,95 +249,6 @@ export default function MessagesPage() {
     );
   }
 
-  const InputField = ({ 
-    label, 
-    path, 
-    value, 
-    placeholder, 
-    type = 'text',
-    className = '', // ← tambahin ini
-  }: { 
-    label: string; 
-    path: string; 
-    value: string; 
-    placeholder: string; 
-    type?: 'text' | 'textarea';
-    className?: string; // ← dan ini
-  }) => {
-    const isEditing = editingKey === path;
-    
-    return (
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label}
-        </label>
-        {isEditing ? (
-          <div className="space-y-2">
-            {type === 'textarea' ? (
-              <textarea
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                rows={10}
-                className={`w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 font-mono text-sm ${className}`}
-                placeholder={placeholder}
-              />
-            ) : (
-              <input
-                type="text"
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                className={`w-full font-mono px-3 py-2 border border-blue-300 rounded-lg focus:border-none ${className}`}
-                placeholder={placeholder}
-              />
-            )}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleSave(path)}
-                  disabled={saving || !editValue.trim()}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  {saving ? 'Saving...' : 'Save'}
-                </button>
-                <button
-                  onClick={handleCancel}
-                  disabled={saving}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => setPreviewKey(previewKey === path ? null : path)}
-                  className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center gap-2"
-                >
-                  <Eye className="w-4 h-4" />
-                  Preview
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="relative group">
-              <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50  whitespace-pre-wrap font-mono text-sm text-black">
-                {value || <span className="text-gray-400">{placeholder}</span>}
-              </div>
-              <button
-                onClick={() => handleEdit(path, value)}
-                className="absolute right-2 top-2 p-2 bg-white border border-gray-300 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50"
-              >
-                <Edit2 className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
-          )}
-          {previewKey === path && (
-            <div className="mt-2 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-xs font-semibold text-green-700 mb-2">PREVIEW (WhatsApp format):</p>
-              <div className="text-sm text-gray-800 whitespace-pre-wrap">{editValue || value}</div>
-            </div>
-          )}
-        </div>
-      );
-    };
-
   return (
     <DashboardLayout>
       <div className="p-8">
@@ -179,7 +261,7 @@ export default function MessagesPage() {
             </div>
             <div className="flex items-center gap-4">
               {successMessage && (
-                <div className="px-4 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-medium animate-fade-in">
+                <div className="px-4 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-medium animate-fade-in flex items-center gap-2">
                   {successMessage}
                 </div>
               )}
@@ -196,11 +278,17 @@ export default function MessagesPage() {
             {(['funnel', 'errors', 'links'] as const).map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${activeTab === tab
+                onClick={() => {
+                  setActiveTab(tab);
+                  setEditingKey(null);
+                  setEditValue('');
+                  setPreviewKey(null);
+                }}
+                className={`py-4 px-1 border-b-2 font-medium text-sm capitalize transition-colors ${
+                  activeTab === tab
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                }`}
               >
                 {tab === 'funnel' ? 'Funnel Messages' : tab === 'errors' ? 'Error Messages' : 'Links & Variables'}
               </button>
@@ -215,22 +303,51 @@ export default function MessagesPage() {
             <div className="space-y-6">
               <InputField
                 label="Ebook Link"
+                className='text-black'
                 path="ebook_link"
                 value={config.ebook_link}
                 placeholder="https://lynk.id/your-ebook-link"
+                editingKey={editingKey}
+                editValue={editValue}
+                saving={saving}
+                previewKey={previewKey}
+                onEdit={handleEdit}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                onEditValueChange={handleEditValueChange}
+                onPreviewToggle={handlePreviewToggle}
               />
               <InputField
                 label="Bonus Link"
                 path="bonus_link"
+                className='text-black'
                 value={config.bonus_link}
                 placeholder="https://drive.google.com/your-bonus-link"
-
+                editingKey={editingKey}
+                editValue={editValue}
+                saving={saving}
+                previewKey={previewKey}
+                onEdit={handleEdit}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                onEditValueChange={handleEditValueChange}
+                onPreviewToggle={handlePreviewToggle}
               />
               <InputField
                 label="Konsultan WhatsApp"
                 path="konsultan_wa"
+                className='text-black'
                 value={config.konsultan_wa}
                 placeholder="https://wa.me/628123456789"
+                editingKey={editingKey}
+                editValue={editValue}
+                saving={saving}
+                previewKey={previewKey}
+                onEdit={handleEdit}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                onEditValueChange={handleEditValueChange}
+                onPreviewToggle={handlePreviewToggle}
               />
             </div>
             <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -260,6 +377,15 @@ export default function MessagesPage() {
                       placeholder="Enter message text..."
                       type="textarea"
                       className="text-black"
+                      editingKey={editingKey}
+                      editValue={editValue}
+                      saving={saving}
+                      previewKey={previewKey}
+                      onEdit={handleEdit}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      onEditValueChange={handleEditValueChange}
+                      onPreviewToggle={handlePreviewToggle}
                     />
                   </div>
                   <div>
@@ -271,6 +397,9 @@ export default function MessagesPage() {
                       <p className="text-xs font-medium text-gray-600 mb-2">Character count:</p>
                       <p className="text-2xl font-bold text-gray-900">{data.message.length}</p>
                       <p className="text-xs text-gray-500 mt-1">WhatsApp limit: 4096</p>
+                      {data.message.length > 4096 && (
+                        <p className="text-xs text-red-600 mt-2 font-medium">⚠️ Exceeds limit!</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -290,8 +419,19 @@ export default function MessagesPage() {
                   label="Error Message"
                   path={`errors.${key}`}
                   value={value}
+                      className="text-black"
+
                   placeholder="Enter error message..."
                   type="textarea"
+                  editingKey={editingKey}
+                  editValue={editValue}
+                  saving={saving}
+                  previewKey={previewKey}
+                  onEdit={handleEdit}
+                  onSave={handleSave}
+                  onCancel={handleCancel}
+                  onEditValueChange={handleEditValueChange}
+                  onPreviewToggle={handlePreviewToggle}
                 />
               </div>
             ))}
@@ -301,7 +441,7 @@ export default function MessagesPage() {
         {/* Info Box */}
         <div className="mt-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex" />
+            <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
             <div>
               <h3 className="font-semibold text-yellow-900 mb-2">Important Notes:</h3>
               <ul className="text-sm text-yellow-800 space-y-1 list-disc list-inside">

@@ -12,6 +12,7 @@ import {
   ExternalLink,
   RefreshCw
 } from 'lucide-react';
+import { checkBotHealth } from '@/lib/utils/api';
 
 // === Status Indicator Component ===
 function StatusIndicator({
@@ -52,17 +53,10 @@ export default function SettingsPage() {
   const [webhookStatus, setWebhookStatus] = useState<'checking' | 'verified' | 'error'>('checking');
   const [firebaseStatus, setFirebaseStatus] = useState<'checking' | 'connected' | 'error'>('checking');
 
- const checkBotStatus = async () => {
-  try {
-    const response = await fetch('/api/bot-status', { cache: 'no-store' });
-    const data = await response.json();
-
-    // anggap status "healthy" = online
-    setBotStatus(data.status === 'healthy' ? 'online' : 'offline');
-  } catch (error) {
-    console.error('Failed to check bot status:', error);
-    setBotStatus('offline');
-  }
+const checkBotStatus = async () => {
+  setBotStatus('checking');
+  const result = await checkBotHealth();
+  setBotStatus(result.status);
 };
 
 
@@ -159,19 +153,6 @@ useEffect(() => {
               <StatusIndicator status={firebaseStatus} />
             </div>
           </div>
-            {/* Firebase Status */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Database className="w-5 h-5 text-orange-600" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Firebase</p>
-                  <p className="text-sm text-gray-500">Database and storage</p>
-                </div>
-              </div>
-              <StatusIndicator status={firebaseStatus} />
-            </div>
           </div>
         </div>
 

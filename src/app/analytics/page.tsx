@@ -6,7 +6,6 @@ import {
   TrendingUp, 
   TrendingDown,
   BarChart3,
-  PieChart as RechartsPie,
   Download,
   Filter,
 } from 'lucide-react';
