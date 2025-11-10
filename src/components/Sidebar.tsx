@@ -14,7 +14,6 @@ import {
   Settings,
   Activity,
   TrendingUp,
-  Logs,
   Terminal
 } from 'lucide-react';
 
