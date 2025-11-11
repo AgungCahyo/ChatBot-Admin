@@ -1,7 +1,4 @@
-
-// ============================================================================
 // src/components/Sidebar.tsx
-// ============================================================================
 'use client';
 
 import Link from 'next/link';
@@ -29,6 +26,7 @@ export default function Sidebar() {
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Messages', href: '/messages', icon: MessageSquare },
+    { name: 'Mess', href: '/messages-template', icon: MessageSquare },
     { name: 'Users', href: '/users', icon: Users },
     { name: 'Consultations', href: '/consultations', icon: Phone },
     { name: 'Analytics', href: '/analytics', icon: TrendingUp },

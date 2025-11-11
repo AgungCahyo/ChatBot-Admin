@@ -1,4 +1,4 @@
-// src/types/index.ts
+// src/types/index.ts - UPDATED VERSION
 
 export interface BotStats {
   totalMessages: number;
@@ -73,6 +73,7 @@ export interface Conversion {
   date: string;
 }
 
+// ✅ UPDATED: Add system_messages to BotConfig
 export interface BotConfig {
   ebook_link: string;
   bonus_link: string;
@@ -86,6 +87,54 @@ export interface BotConfig {
   errors: {
     unsupported_type: string;
     general_error: string;
+  };
+  system_messages?: {
+    offline_hours?: {
+      message: string;
+      greeting_with_name: boolean;
+    };
+    consultation_notification?: {
+      template: string;
+    };
+    button_text?: {
+      welcome_download: string;
+      welcome_tips: string;
+      welcome_consultation: string;
+      mulai_tips: string;
+      mulai_bonus: string;
+      mulai_autopilot: string;
+      tips_bonus: string;
+      tips_autopilot: string;
+      tips_consultation: string;
+      bonus_autopilot: string;
+      bonus_consultation: string;
+      autopilot_consultation: string;
+    };
+    button_footer?: {
+      welcome: string;
+      mulai: string;
+      tips: string;
+      bonus: string;
+      autopilot: string;
+    };
+    follow_up_messages?: {
+      after_mulai: string;
+      after_tips: string;
+      after_bonus: string;
+      after_autopilot: string;
+    };
+    list_menu?: {
+      button_text: string;
+      footer_text: string;
+      sections: Array<{
+        title: string;
+        rows: Array<{
+          id: string;
+          title: string;
+          description: string;
+        }>;
+      }>;
+    };
   };
   last_updated?: Date;
   updated_by?: string;

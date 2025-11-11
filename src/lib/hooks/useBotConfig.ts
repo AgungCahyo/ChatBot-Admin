@@ -1,6 +1,5 @@
-
 // ============================================================================
-// src/lib/hooks/useBotConfig.ts
+// src/lib/hooks/useBotConfig.ts - UPDATED VERSION
 // ============================================================================
 import { BotConfig } from '@/types';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -23,6 +22,7 @@ export function useBotConfig() {
           konsultan_wa: data.konsultan_wa,
           funnel: data.funnel,
           errors: data.errors,
+          system_messages: data.system_messages, // ✅ ADDED: Support for system_messages
           last_updated: data.last_updated?.toDate(),
           updated_by: data.updated_by
         });

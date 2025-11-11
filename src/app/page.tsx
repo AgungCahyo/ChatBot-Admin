@@ -28,6 +28,7 @@ import { useStats } from '@/lib/hooks/useStats';
 import { useKeywordStats } from '@/lib/hooks/useKeywordStats';
 import { useHourlyActivity } from '@/lib/hooks/useHourlyActivity';
 import { useMessages } from '@/lib/hooks/useMessages';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const { stats, loading: statsLoading } = useStats();
@@ -125,9 +126,9 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-gray-900">Keyword Performance</h2>
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              <Link href={"/keywords"} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 View All →
-              </button>
+              </Link>
             </div>
             {keywordLoading ? (
               <div className="h-80 flex items-center justify-center">
@@ -189,9 +190,9 @@ export default function Dashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">Recent Messages</h2>
-            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            <Link href={"/all-messages"} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
               View All →
-            </button>
+            </Link>
           </div>
           {messagesLoading ? (
             <div className="h-64 flex items-center justify-center">
