@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
-  MessageSquare, 
   Users, 
   Phone, 
   Settings,
   Activity,
   TrendingUp,
   Terminal,
-  Notebook,
+  Send,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface NavItem {
@@ -26,13 +26,14 @@ export default function Sidebar() {
 
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'Broadcast', href: '/broadcast', icon: Send },
     { name: 'Consultations', href: '/consultations', icon: Phone },
     { name: 'Users', href: '/users', icon: Users },
     { name: 'Analytics', href: '/analytics', icon: TrendingUp },
-    { name: 'Konfigurasi', href: '/messages-configuration', icon: MessageSquare },
+    { name: 'Konfigurasi', href: '/messages-configuration', icon: Settings },
     { name: 'Logs', href: '/logs', icon: Terminal },
     { name: 'Settings', href: '/settings', icon: Settings },
-    { name: 'Privacy Police', href: '/privacy-police', icon: Notebook },
+    { name: 'Privacy Police', href: '/privacy-police', icon: ShieldCheck },
   ];
 
   return (

@@ -163,3 +163,27 @@ export interface StatCardProps {
   trend?: number;
   color?: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'cyan';
 }
+
+
+// Broadcast Types
+export interface BroadcastMessage {
+  id: string;
+  message: string;
+  targetAudience: 'all' | 'active' | 'inactive' | 'converted' | 'custom';
+  customUserIds?: string[];
+  scheduledAt?: Date;
+  sentAt?: Date;
+  status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed';
+  totalRecipients: number;
+  sentCount: number;
+  failedCount: number;
+  createdBy: string;
+  createdAt: Date;
+}
+
+export interface BroadcastResult {
+  success: number;
+  failed: number;
+  total: number;
+  errors?: Array<{ userId: string; error: string }>;
+}
