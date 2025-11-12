@@ -1,4 +1,4 @@
-// src/types/index.ts - UPDATED VERSION
+// src/types/index.ts - UPDATED WITH WORKING HOURS
 
 export interface BotStats {
   totalMessages: number;
@@ -73,7 +73,16 @@ export interface Conversion {
   date: string;
 }
 
-// ✅ UPDATED: Add system_messages to BotConfig
+// ✅ NEW: Working Hours Interface
+export interface WorkingHours {
+  enabled: boolean;
+  start_hour: number;
+  end_hour: number;
+  timezone: string;
+  days: number[]; // 0=Sunday, 1=Monday, ..., 6=Saturday
+}
+
+// ✅ UPDATED: Add working_hours to BotConfig
 export interface BotConfig {
   ebook_link: string;
   bonus_link: string;
@@ -88,6 +97,7 @@ export interface BotConfig {
     unsupported_type: string;
     general_error: string;
   };
+  working_hours?: WorkingHours;
   system_messages?: {
     offline_hours?: {
       message: string;

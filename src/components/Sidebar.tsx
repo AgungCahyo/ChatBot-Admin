@@ -11,7 +11,8 @@ import {
   Settings,
   Activity,
   TrendingUp,
-  Terminal
+  Terminal,
+  Notebook,
 } from 'lucide-react';
 
 interface NavItem {
@@ -25,13 +26,13 @@ export default function Sidebar() {
 
   const navigation: NavItem[] = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Messages', href: '/messages', icon: MessageSquare },
-    { name: 'Mess', href: '/messages-template', icon: MessageSquare },
-    { name: 'Users', href: '/users', icon: Users },
     { name: 'Consultations', href: '/consultations', icon: Phone },
+    { name: 'Users', href: '/users', icon: Users },
     { name: 'Analytics', href: '/analytics', icon: TrendingUp },
+    { name: 'Konfigurasi', href: '/messages-configuration', icon: MessageSquare },
     { name: 'Logs', href: '/logs', icon: Terminal },
     { name: 'Settings', href: '/settings', icon: Settings },
+    { name: 'Privacy Police', href: '/privacy-police', icon: Notebook },
   ];
 
   return (
