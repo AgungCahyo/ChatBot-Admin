@@ -83,7 +83,7 @@ export default function BroadcastPage() {
   };
 
   const selectAll = () => {
-    setSelectedUsers(filteredUsers.map(u => u.userId));
+    setSelectedUsers(users.map(u => u.userId));
   };
 
   const deselectAll = () => {
@@ -236,7 +236,7 @@ export default function BroadcastPage() {
               onChange={(e) => setMessage(e.target.value)}
               rows={8}
               placeholder="Type your broadcast message here...&#10;&#10;You can use *bold*, _italic_ for WhatsApp formatting."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+              className="w-full text-black px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
             />
             <div className="flex items-center justify-between mt-2">
               <p className="text-xs text-gray-500">

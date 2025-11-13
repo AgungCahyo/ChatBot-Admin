@@ -1,4 +1,4 @@
-// src/types/index.ts - UPDATED WITH WORKING HOURS
+// src/types/index.ts - FIXED TYPE DEFINITIONS
 
 export interface BotStats {
   totalMessages: number;
@@ -9,10 +9,12 @@ export interface BotStats {
   lastUpdated?: Date;
 }
 
+// ✅ FIXED: Add userName field
 export interface Message {
   id: string;
   messageId: string;
   from: string;
+  userName?: string; // ✅ NEW: Add optional userName field
   type: 'text' | 'interactive';
   textBody: string;
   keyword: string;
@@ -73,16 +75,65 @@ export interface Conversion {
   date: string;
 }
 
-// ✅ NEW: Working Hours Interface
 export interface WorkingHours {
   enabled: boolean;
   start_hour: number;
   end_hour: number;
   timezone: string;
-  days: number[]; // 0=Sunday, 1=Monday, ..., 6=Saturday
+  days: number[];
 }
 
-// ✅ UPDATED: Add working_hours to BotConfig
+// ✅ FIXED: Proper typing for system_messages (not string | Record)
+export interface SystemMessages {
+  offline_hours?: {
+    message: string;
+    greeting_with_name: boolean;
+  };
+  consultation_notification?: {
+    template: string;
+  };
+  button_text?: {
+    welcome_download: string;
+    welcome_tips: string;
+    welcome_consultation: string;
+    mulai_tips: string;
+    mulai_bonus: string;
+    mulai_autopilot: string;
+    tips_bonus: string;
+    tips_autopilot: string;
+    tips_consultation: string;
+    bonus_autopilot: string;
+    bonus_consultation: string;
+    autopilot_consultation: string;
+  };
+  button_footer?: {
+    welcome: string;
+    mulai: string;
+    tips: string;
+    bonus: string;
+    autopilot: string;
+  };
+  follow_up_messages?: {
+    after_mulai: string;
+    after_tips: string;
+    after_bonus: string;
+    after_autopilot: string;
+  };
+  list_menu?: {
+    button_text: string;
+    footer_text: string;
+    sections: Array<{
+      title: string;
+      rows: Array<{
+        id: string;
+        title: string;
+        description: string;
+      }>;
+    }>;
+  };
+}
+
+// ✅ FIXED: Use proper SystemMessages type
 export interface BotConfig {
   ebook_link: string;
   bonus_link: string;
@@ -98,54 +149,7 @@ export interface BotConfig {
     general_error: string;
   };
   working_hours?: WorkingHours;
-  system_messages?: {
-    offline_hours?: {
-      message: string;
-      greeting_with_name: boolean;
-    };
-    consultation_notification?: {
-      template: string;
-    };
-    button_text?: {
-      welcome_download: string;
-      welcome_tips: string;
-      welcome_consultation: string;
-      mulai_tips: string;
-      mulai_bonus: string;
-      mulai_autopilot: string;
-      tips_bonus: string;
-      tips_autopilot: string;
-      tips_consultation: string;
-      bonus_autopilot: string;
-      bonus_consultation: string;
-      autopilot_consultation: string;
-    };
-    button_footer?: {
-      welcome: string;
-      mulai: string;
-      tips: string;
-      bonus: string;
-      autopilot: string;
-    };
-    follow_up_messages?: {
-      after_mulai: string;
-      after_tips: string;
-      after_bonus: string;
-      after_autopilot: string;
-    };
-    list_menu?: {
-      button_text: string;
-      footer_text: string;
-      sections: Array<{
-        title: string;
-        rows: Array<{
-          id: string;
-          title: string;
-          description: string;
-        }>;
-      }>;
-    };
-  };
+  system_messages?: SystemMessages; // ✅ FIXED: Use proper type instead of string | Record
   last_updated?: Date;
   updated_by?: string;
 }
@@ -164,8 +168,6 @@ export interface StatCardProps {
   color?: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'cyan';
 }
 
-
-// Broadcast Types
 export interface BroadcastMessage {
   id: string;
   message: string;

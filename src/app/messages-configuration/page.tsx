@@ -3,13 +3,13 @@
 
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { 
-  Save, 
-  Edit2, 
-  Eye, 
-  AlertCircle, 
-  RefreshCw, 
-  X, 
+import {
+  Save,
+  Edit2,
+  Eye,
+  AlertCircle,
+  RefreshCw,
+  X,
   Settings,
   CheckCircle,
   Calendar
@@ -262,7 +262,7 @@ export default function ConfigurationPage() {
 
   const getCurrentTime = () => {
     try {
-      return new Date().toLocaleString('id-ID', { 
+      return new Date().toLocaleString('id-ID', {
         timeZone: whTimezone, hour: '2-digit', minute: '2-digit', second: '2-digit',
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       });
@@ -466,19 +466,19 @@ export default function ConfigurationPage() {
               </div>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
-                <select value={whTimezone} onChange={(e) => setWhTimezone(e.target.value)} disabled={!whEnabled} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100">
+                <select value={whTimezone} onChange={(e) => setWhTimezone(e.target.value)} disabled={!whEnabled} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black disabled:bg-gray-100">
                   {TIMEZONES.map(tz => (<option key={tz.value} value={tz.value}>{tz.label}</option>))}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Start Hour</label>
-                  <input type="number" min="0" max="23" value={whStartHour} onChange={(e) => setWhStartHour(parseInt(e.target.value))} disabled={!whEnabled} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100" />
+                  <input type="number" min="0" max="23" value={whStartHour} onChange={(e) => setWhStartHour(parseInt(e.target.value))} disabled={!whEnabled} className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100" />
                   <p className="text-xs text-gray-500 mt-1">{String(whStartHour).padStart(2, '0')}:00</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">End Hour</label>
-                  <input type="number" min="0" max="23" value={whEndHour} onChange={(e) => setWhEndHour(parseInt(e.target.value))} disabled={!whEnabled} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100" />
+                  <input type="number" min="0" max="23" value={whEndHour} onChange={(e) => setWhEndHour(parseInt(e.target.value))} disabled={!whEnabled} className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100" />
                   <p className="text-xs text-gray-500 mt-1">{String(whEndHour).padStart(2, '0')}:00</p>
                 </div>
               </div>

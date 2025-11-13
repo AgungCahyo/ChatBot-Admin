@@ -1,9 +1,9 @@
-// ============================================================================
-// src/app/layout.tsx
-// ============================================================================
+// src/app/layout.tsx - UPDATED WITH AUTH PROVIDER
 import './globals.css';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,7 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <ErrorBoundary>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ErrorBoundary>
+      </body>
     </html>
   );
 }

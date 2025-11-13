@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { 
-  TrendingUp, 
-  Search, 
+import {
+  TrendingUp,
+  Search,
   Download,
   Filter,
   Target,
@@ -12,18 +12,18 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useKeywordStats } from '@/lib/hooks/useKeywordStats';
-import { 
-  BarChart, 
+import {
+  BarChart,
   Bar,
   PieChart,
   Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from 'recharts';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -32,7 +32,7 @@ export default function KeywordsPage() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'count' | 'conversions' | 'rate'>('count');
-  
+
   const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
   const { keywordStats, loading } = useKeywordStats(days);
 
@@ -97,7 +97,7 @@ export default function KeywordsPage() {
               <p className="text-gray-500 mt-1">Detailed keyword performance and insights</p>
             </div>
             <div className="flex items-center gap-4">
-              <select 
+              <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value as '7d' | '30d' | '90d')}
                 className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
@@ -203,8 +203,8 @@ export default function KeywordsPage() {
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }: { name?: string; percent?: number }) =>
-        `${name}: ${(percent ?? 0 * 100).toFixed(0)}%`
-      }
+                      `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
+                    }
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
@@ -274,8 +274,8 @@ export default function KeywordsPage() {
                   {filteredKeywords.map((stat, index) => {
                     const conversionRate = stat.count > 0 ? (stat.conversions / stat.count * 100).toFixed(1) : '0.0';
                     const performance = parseFloat(conversionRate) >= 20 ? 'excellent' :
-                                      parseFloat(conversionRate) >= 10 ? 'good' : 'needs-improvement';
-                    
+                      parseFloat(conversionRate) >= 10 ? 'good' : 'needs-improvement';
+
                     return (
                       <tr key={stat.keyword} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-3 px-4 text-sm text-gray-600">#{index + 1}</td>
@@ -287,23 +287,21 @@ export default function KeywordsPage() {
                         <td className="py-3 px-4 text-sm font-semibold text-gray-900">{stat.count.toLocaleString()}</td>
                         <td className="py-3 px-4 text-sm text-gray-600">{stat.conversions}</td>
                         <td className="py-3 px-4">
-                          <span className={`text-sm font-semibold ${
-                            parseFloat(conversionRate) >= 20 ? 'text-green-600' :
+                          <span className={`text-sm font-semibold ${parseFloat(conversionRate) >= 20 ? 'text-green-600' :
                             parseFloat(conversionRate) >= 10 ? 'text-yellow-600' :
-                            'text-red-600'
-                          }`}>
+                              'text-red-600'
+                            }`}>
                             {conversionRate}%
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            performance === 'excellent' ? 'bg-green-100 text-green-700' :
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${performance === 'excellent' ? 'bg-green-100 text-green-700' :
                             performance === 'good' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-red-100 text-red-700'
-                          }`}>
+                              'bg-red-100 text-red-700'
+                            }`}>
                             {performance === 'excellent' ? '🎯 Excellent' :
-                             performance === 'good' ? '👍 Good' :
-                             '⚠️ Needs Work'}
+                              performance === 'good' ? '👍 Good' :
+                                '⚠️ Needs Work'}
                           </span>
                         </td>
                       </tr>

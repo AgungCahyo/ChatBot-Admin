@@ -227,132 +227,148 @@ export default function AllMessagesPage() {
         </div>
 
         {/* Messages Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 sticky top-0">
-                  <tr>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        Timestamp
-                      </div>
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        User
-                      </div>
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Hash className="w-4 h-4" />
-                        Type
-                      </div>
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4" />
-                        Message
-                      </div>
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Keyword</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Status</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredMessages.map((msg) => (
-                    <tr key={msg.id} className="hover:bg-gray-50">
-                      <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
-                        {msg.timestamp ? (
-                          <div>
-                            <div>{msg.timestamp.toLocaleDateString('id-ID')}</div>
-                            <div className="text-xs text-gray-400">
-                              {msg.timestamp.toLocaleTimeString('id-ID', { 
-                                hour: '2-digit', 
-                                minute: '2-digit' 
-                              })}
-                            </div>
-                          </div>
-                        ) : '-'}
-                      </td>
-                      <td className="py-3 px-4 text-sm">
-                        <div>
-                          <div className="font-mono text-gray-900">{msg.from.substring(0, 15)}...</div>
-                          <div className="text-xs text-gray-500">ID: {msg.messageId.substring(0, 10)}...</div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          msg.type === 'text' 
-                            ? 'bg-blue-50 text-blue-700' 
-                            : 'bg-purple-50 text-purple-700'
-                        }`}>
-                          {msg.type}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-gray-900 max-w-md">
-                        <div className="truncate" title={msg.textBody}>
-                          {msg.textBody}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
-                          {msg.keyword}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`flex items-center gap-1 text-xs font-medium ${
-                          msg.status === 'success' 
-                            ? 'text-green-600' 
-                            : 'text-red-600'
-                        }`}>
-                          <div className={`w-2 h-2 rounded-full ${
-                            msg.status === 'success' 
-                              ? 'bg-green-500' 
-                              : 'bg-red-500'
-                          }`}></div>
-                          {msg.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <a
-                          href={`https://wa.me/${msg.from}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Chat
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredMessages.length === 0 && (
-                <div className="text-center py-12">
-                  <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">No messages found</p>
-                  {(searchQuery || keywordFilter || typeFilter) && (
-                    <button
-                      onClick={clearFilters}
-                      className="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      Clear filters to see all messages
-                    </button>
-                  )}
+
+
+{/* Messages Table */}
+<div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+  {loading ? (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+    </div>
+  ) : (
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-gray-50 sticky top-0">
+          <tr>
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Timestamp
+              </div>
+            </th>
+            {/* ✅ NEW: Name Column */}
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Name
+              </div>
+            </th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Phone
+              </div>
+            </th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+              <div className="flex items-center gap-2">
+                <Hash className="w-4 h-4" />
+                Type
+              </div>
+            </th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Message
+              </div>
+            </th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Keyword</th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Status</th>
+            <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {filteredMessages.map((msg) => (
+            <tr key={msg.id} className="hover:bg-gray-50">
+              <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
+                {msg.timestamp ? (
+                  <div>
+                    <div>{msg.timestamp.toLocaleDateString('id-ID')}</div>
+                    <div className="text-xs text-gray-400">
+                      {msg.timestamp.toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </div>
+                  </div>
+                ) : '-'}
+              </td>
+              {/* ✅ NEW: Display Name */}
+              <td className="py-3 px-4 text-sm">
+                <div className="font-medium text-gray-900">
+                  {msg.userName || 'Unknown'}
                 </div>
-              )}
-            </div>
+              </td>
+              <td className="py-3 px-4 text-sm">
+                <div>
+                  <div className="font-mono text-gray-900">{msg.from.substring(0, 15)}...</div>
+                  <div className="text-xs text-gray-500">ID: {msg.messageId.substring(0, 10)}...</div>
+                </div>
+              </td>
+              <td className="py-3 px-4">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  msg.type === 'text' 
+                    ? 'bg-blue-50 text-blue-700' 
+                    : 'bg-purple-50 text-purple-700'
+                }`}>
+                  {msg.type}
+                </span>
+              </td>
+              <td className="py-3 px-4 text-sm text-gray-900 max-w-md">
+                <div className="truncate" title={msg.textBody}>
+                  {msg.textBody}
+                </div>
+              </td>
+              <td className="py-3 px-4">
+                <span className="px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
+                  {msg.keyword}
+                </span>
+              </td>
+              <td className="py-3 px-4">
+                <span className={`flex items-center gap-1 text-xs font-medium ${
+                  msg.status === 'success' 
+                    ? 'text-green-600' 
+                    : 'text-red-600'
+                }`}>
+                  <div className={`w-2 h-2 rounded-full ${
+                    msg.status === 'success' 
+                      ? 'bg-green-500' 
+                      : 'bg-red-500'
+                  }`}></div>
+                  {msg.status}
+                </span>
+              </td>
+              <td className="py-3 px-4">
+                <a
+                  href={`https://wa.me/${msg.from}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Chat
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {filteredMessages.length === 0 && (
+        <div className="text-center py-12">
+          <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">No messages found</p>
+          {(searchQuery || keywordFilter || typeFilter) && (
+            <button
+              onClick={clearFilters}
+              className="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              Clear filters to see all messages
+            </button>
           )}
         </div>
+      )}
+    </div>
+  )}
+</div>
 
         {/* Info Box */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">

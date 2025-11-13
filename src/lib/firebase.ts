@@ -1,8 +1,7 @@
-// ============================================================================
-// src/lib/firebase.ts
-// ============================================================================
+// src/lib/firebaseClient.ts - UPDATED WITH AUTH
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,6 +12,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
+// Initialize Firebase
 let app: FirebaseApp;
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -20,12 +20,8 @@ if (!getApps().length) {
   app = getApps()[0];
 }
 
+// Initialize services
 export const db: Firestore = getFirestore(app);
+export const auth: Auth = getAuth(app);
+
 export default app;
-
-
-
-
-
-
-
